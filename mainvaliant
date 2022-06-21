@@ -19,5 +19,5 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/godware123/empsilent/
 
 
 local hotkey = "t" 
-local accomidationfactor = 0.122
-getgenv().ValiantAimHacks.FOV = 60
+local accomidationfactor = 0.124662515
+getgenv().ValiantAimHacks.FOV = 13.8
