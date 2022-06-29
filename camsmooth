@@ -1,5 +1,7 @@
 
 
+-- Locals 
+
 local LocalPlayer = game.Players.LocalPlayer
 
 local Mouse = LocalPlayer:GetMouse()
@@ -15,6 +17,262 @@ local camera = workspace.CurrentCamera
 local worldToViewportPoint = camera.worldToViewportPoint
 
 
+local function fail(r) return LocalPlayer:Kick(r) end
+
+local usedCache = shared.__urlcache and next(shared.__urlcache) ~= nil
+
+shared.__urlcache = shared.__urlcache or {}
+local function httpload(url)
+    local success, result
+
+    if shared.__urlcache[url] then
+        success, result = true, shared.__urlcache[url]
+    else
+        success, result = pcall(game.HttpGet, game, url)
+    end
+
+    if (not success) then
+        return fail(string.format('Failed to GET url %q for reason: %q', url, tostring(result)))
+    end
+
+    local fn, err = loadstring(result)
+    if (type(fn) ~= 'function') then
+        return fail(string.format('Failed to loadstring url %q for reason: %q', url, tostring(err)))
+    end
+
+    local results = { pcall(fn) }
+    if (not results[1]) then
+        return fail(string.format('Failed to initialize url %q for reason: %q', url, tostring(results[2])))
+    end
+
+    shared.__urlcache[url] = result
+    return unpack(results, 2)
+end
+
+local prefix = "Vv"
+
+local function log(text)
+    print(prefix..text)
+end
+
+local function warn(text)
+    warn(prefix..text)
+end
+
+-- Anti Cheat Bypass
+
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local MainEvent = ReplicatedStorage.MainEvent
+
+local HB = RunService.Heartbeat
+
+do 
+   local oldFunc = nil
+
+  oldFunc = hookfunction(MainEvent.FireServer, newcclosure(function(Event, ...)
+     local args = {...}
+
+     if args[1] == "CHECKER_1" or args[1] == "TeleportDetect" or args[1] == "OneMoreTime" then
+        return nil
+     end
+
+     return oldFunc(Event, ...)
+  end))
+
+   HB:Connect(function()
+       local root = LocalPlayer.Character and LocalPlayer.Character.PrimaryPart
+
+       if root then
+           for i,v in pairs(getconnections(root:GetPropertyChangedSignal("CFrame"))) do
+               v:Disable()
+           end
+       end
+   end)
+
+  local function added(char)
+     while true do
+           if not char then return end
+        HB:Wait()
+        for i,v in pairs(char:GetChildren()) do
+           if v:IsA("Script") and v:FindFirstChildOfClass("LocalScript") then
+              v:FindFirstChildOfClass("LocalScript").Source = "Cleared"
+              return
+           end
+        end
+     end
+  end
+
+  if LocalPlayer.Character then
+     added(LocalPlayer.Character)
+  end
+
+  LocalPlayer.CharacterAdded:Connect(added)
+
+end
+
+log("Bypassed Anti-Cheat")
+
+
+
+
+-- main
+
+
+
+	
+	
+
+getgenv().Key = Enum.KeyCode.X
+getgenv().Prediction = 1.36
+getgenv().AirshotFunccc = false
+getgenv().Tracer = false
+getgenv().Partz = "LowerTorso" -- LowerTorso, HumanoidRootPart,Head,UpperTorso
+getgenv().Notificationmode = false
+
+local guimain = Instance.new("Folder", game.CoreGui)
+local CC = game:GetService "Workspace".CurrentCamera
+local LocalMouse = game.Players.LocalPlayer:GetMouse()
+local Locking = false
+local cc = game:GetService("Workspace").CurrentCamera
+local gs = game:GetService("GuiService")
+local ggi = gs.GetGuiInset
+local lp = game:GetService("Players").LocalPlayer
+local mouse = lp:GetMouse()
+
+local Tracer = Drawing.new("Line")
+Tracer.Visible = false
+Tracer.Color = Color3.fromRGB(255, 20, 88)
+Tracer.Thickness = 1
+Tracer.Transparency = 1
+
+local sound = Instance.new("Sound", game.Workspace)
+sound.SoundId = "rbxassetid://8797307263"
+
+if not sound.IsLoaded then
+	sound.Loaded:wait()
+end
+
+local sound1 = Instance.new("Sound", game.Workspace)
+sound1.SoundId = "rbxassetid://8797308613"
+
+if not sound1.IsLoaded then
+	sound1.Loaded:wait()
+end
+
+local StepTable = {}
+local function BindToSteppedold(name, num, func)
+	if StepTable[name] == nil then
+		StepTable[name] = game:GetService("RunService").Stepped:connect(func)
+	end
+end
+
+local function UnbindFromSteppedold(name)
+	if StepTable[name] then
+		StepTable[name]:Disconnect()
+		StepTable[name] = nil
+	end
+end
+
+
+function x(tt, tx, cc)
+    game.StarterGui:SetCore(
+        "SendNotification",
+        {
+            Title = tt,
+            Text = tx,
+            Duration = cc
+        }
+    )
+end
+
+local UserInputService = game:GetService("UserInputService")
+
+UserInputService.InputBegan:Connect(
+    function(keygo, ok)
+        if (not ok) then
+            if (keygo.KeyCode == getgenv().Key) then
+                if getgenv().loltoggle then
+                    Locking = not Locking
+                    if Locking then
+                        Plr = getClosestPlayerToCursor()
+                        getgenv().targetenabledV3 = true
+                        if getgenv().Notificationmode then
+                            StarterGui:SetCore(
+                            "SendNotification",
+                            {
+                           x("emp", "Victim : "..Plr.DisplayName, 3)
+                            })
+                        end
+                        if getgenv().ViewMode == true then
+                            game.Workspace.CurrentCamera.CameraSubject = Plr.Character
+                        end
+                        if getgenv().ChatMode == true then
+                            local A_3 = "emp💤 : "..Plr.DisplayName
+                            local A_4 = "All"
+                            local Event = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest
+                            Event:FireServer(A_3, A_4)
+                        end
+                        if getgenv().TPToPlayer == true then
+                            LocalPlayer.Character.HumanoidRootPart.CFrame = Plr.Character.HumanoidRootPart.CFrame
+                        end
+                        if getgenv().BenMode == true then
+                            sound:Play()
+                        end
+                        if getgenv().TargetStrafeV3 == true then
+                            local i = 0
+                            BindToSteppedold("TargetStrafev3", nil, function(dt)
+                            i = (i + dt/getgenv().TSV3Multiplier) % 1
+                            local alpha = 2 * math.pi * i
+                
+                            game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.Angles(0, alpha, 0)
+                            * CFrame.new(0, 0, getgenv().TSV3Distance)
+                            + Plr.Character.HumanoidRootPart.Position
+                        end)
+                        end
+                    elseif not Locking then
+                        UnbindFromSteppedold("TargetStrafev3")
+                        if getgenv().Notificationmode then
+                            x("emp", "Unvictimised", 3)
+                        end
+                        if getgenv().ViewMode == true then
+                            game.Workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character
+                        end
+                        
+                        if getgenv().ChatMode == true then
+                            local A_1 = "unlocked 💤"
+                            local A_2 = "All"
+                            local Event = game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest
+                            Event:FireServer(A_1, A_2)
+                        end
+                        if getgenv().BenMode == true then
+                            sound1:Play()
+                        end
+                    end
+                end
+            end
+        end
+    end
+)
+
+RunService.Heartbeat:Connect(function()
+    if getgenv().LookAt == true then
+        local Char = game.Players.LocalPlayer.Character
+        local PrimaryPartOfChar = game.Players.LocalPlayer.Character.PrimaryPart
+        local NearestChar = Plr.Character
+        local NearestRoot = Plr.Character.HumanoidRootPart
+        local NearestPos = CFrame.new(PrimaryPartOfChar.Position, Vector3.new(NearestRoot.Position.X, NearestRoot.Position.Y, NearestRoot.Position.Z))
+        Char:SetPrimaryPartCFrame(NearestPos)
+    else
+        local Char = game.Players.LocalPlayer.Character
+        local PrimaryPartOfChar = game.Players.LocalPlayer.Character.PrimaryPart
+        local NearestChar = LocalPlayer.Character
+        local NearestRoot = LocalPlayer.Character.HumanoidRootPart
+        local NearestPos = CFrame.new(PrimaryPartOfChar.Position, Vector3.new(NearestRoot.Position.X, NearestRoot.Position.Y, NearestRoot.Position.Z))
+        Char:SetPrimaryPartCFrame(LocalPlayer)
+    end
+end)
 function getClosestPlayerToCursor()
     local closestPlayer
     local shortestDistance = 137
@@ -376,4 +634,52 @@ game:GetService("RunService").RenderStepped:Connect(
                 getgenv().AimPart = getgenv().OldAimPart
             end
         end
-end)
+
+        if getgenv().autoclick then
+            mouse1click()
+            mouse1release()
+        end
+    end
+)
+
+getgenv().cframespeedtoggle = false
+getgenv().speedvalue = 0.35
+getgenv().Spinbot = false
+getgenv().Jitter = false
+getgenv().Layspinbot = false
+getgenv().AntiAim1 = false
+getgenv().AntiAim2 = false
+getgenv().antistomplo = false
+getgenv().autoreload = false
+getgenv().autostomp = false
+getgenv().antibag = false
+getgenv().trashtalkl = false
+getgenv().antilock = false
+getgenv().antilockspeed = 0.260319
+getgenv().DesyncEnabled = false
+getgenv().DesyncVelocity = 15
+getgenv().BenMode = false
+getgenv().TPToPlayer = false
+getgenv().LookAt = false
+getgenv().Jitter = false
+getgenv().RotationSpeed = 250 
+getgenv().VectorSpeed = 250 
+getgenv().AntiAimHeight = 1
+getgenv().TSV3Multiplier = 10000
+getgenv().TSV3Distance = 5
+getgenv().cfskey = z
+--
+    local userInput = game:service('UserInputService')
+    local runService = game:service('RunService')
+ 
+    userInput.InputBegan:connect(function(Key)
+        if Key.KeyCode == getgenv().cfskey then
+            Enabled = not Enabled
+            if Enabled == true then
+                repeat
+                    game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame + game.Players.LocalPlayer.Character.Humanoid.MoveDirection * getgenv().Multiplier
+                    runService.Stepped:wait()
+                until Enabled == false
+            end
+        end
+    end)
