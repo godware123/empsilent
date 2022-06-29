@@ -1,5 +1,42 @@
-getgenv().OldAimPart = "HumanoidRootPart"
-getgenv().AimPart = "HumanoidRootPart" -- For R15 Games: {UpperTorso, LowerTorso, HumanoidRootPart, Head} | For R6 Games: {Head, Torso, HumanoidRootPart}
+function getClosestPlayerToCursor()
+    local closestPlayer
+    local shortestDistance = 137
+
+    for i, v in pairs(game.Players:GetPlayers()) do
+        if
+            v ~= game.Players.LocalPlayer and v.Character and v.Character:FindFirstChild("Humanoid") and
+                v.Character.Humanoid.Health ~= 0 and
+                v.Character:FindFirstChild("LowerTorso")
+         then
+            local pos = CC:WorldToViewportPoint(v.Character.PrimaryPart.Position)
+            local magnitude = (Vector2.new(pos.X, pos.Y) - Vector2.new(LocalMouse.X, LocalMouse.Y)).magnitude
+            if magnitude < shortestDistance then
+                closestPlayer = v
+                shortestDistance = magnitude
+            end
+        end
+    end
+    return closestPlayer
+end
+
+local rawmetatable = getrawmetatable(game)
+local old = rawmetatable.__namecall
+setreadonly(rawmetatable, false)
+rawmetatable.__namecall =
+    newcclosure(
+    function(...)
+        local args = {...}
+        if Locking and getnamecallmethod() == "FireServer" and args[2] == "UpdateMousePos" then
+            args[3] =
+                Plr.Character[getgenv().Partz].Position + (Plr.Character[getgenv().Partz].Velocity * Prediction / 10)
+            return old(unpack(args))
+        end
+        return old(...)
+    end
+)
+
+getgenv().OldAimPart = "LowerTorso"
+getgenv().AimPart = "LowerTorso" -- For R15 Games: {UpperTorso, LowerTorso, HumanoidRootPart, Head} | For R6 Games: {Head, Torso, HumanoidRootPart}
 getgenv().AimlockKey = "x"
 getgenv().AimRadius = 30 -- How far away from someones character you want to lock on at
 getgenv().ThirdPerson = true
@@ -8,8 +45,8 @@ getgenv().TeamCheck = false -- Check if Target is on your Team (True means it wo
 getgenv().PredictMovement = true -- Predicts if they are moving in fast velocity (like jumping) so the aimbot will go a bit faster to match their speed
 getgenv().PredictionVelocity = 1.35
 getgenv().CheckIfJumped = false
-getgenv().Smoothness = true
-getgenv().SmoothnessAmount = 0.0155
+getgenv().Smoothness = false
+getgenv().SmoothnessAmount = 0.0365
 getgenv().lockautosetup = false
 getgenv().airshotbonee = "RightFoot"
 local Players, Uis, RService, SGui =
@@ -322,4 +359,4 @@ game:GetService("RunService").RenderStepped:Connect(
                 getgenv().AimPart = getgenv().OldAimPart
             end
         end
-    end)
+end)
