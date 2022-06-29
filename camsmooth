@@ -1,3 +1,20 @@
+
+
+local LocalPlayer = game.Players.LocalPlayer
+
+local Mouse = LocalPlayer:GetMouse()
+
+local RunService = game:GetService("RunService")
+
+local workspace = game:GetService("Workspace")
+
+local Light = game:GetService("Lighting")
+
+local camera = workspace.CurrentCamera
+
+local worldToViewportPoint = camera.worldToViewportPoint
+
+
 function getClosestPlayerToCursor()
     local closestPlayer
     local shortestDistance = 137
