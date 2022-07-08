@@ -13,7 +13,7 @@ local CurrentCamera = Workspace.CurrentCamera
 local Mouse = LocalPlayer:GetMouse()
 
 -- // Silent Aim Vars
-getgenv().ValiantAimHacks = {
+getgenv().DrownsAimHacks = {
     SilentAimEnabled = true,
     ShowFOV = true,
     VisibleCheck = true,
